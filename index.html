@@ -49,6 +49,7 @@
     #library-view {
       width: 100%; height: 100%; display: flex; flex-direction: column;
       padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
       background: linear-gradient(180deg, #e8dfd1 0%, #d8ccb8 100%);
     }
     .lib-header {
@@ -72,6 +73,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-height: 0;
     }
     .shelf-section {
       flex: 1;
@@ -104,16 +106,16 @@
       font-weight: 600;
     }
 
-    /* 3 SÜTUNLU KOMPAKT RAF: Tek satır kaydırmadan bölmenin içine tam oturur */
+    /* 3 SÜTUNLU KOMPAKT RAF */
     .book-grid {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 8px 10px 10px;
+      padding: 7px 10px 8px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       column-gap: 12px;
-      row-gap: 12px;
+      row-gap: 10px;
       align-content: start;
     }
     @media (min-width: 520px) {
@@ -131,7 +133,7 @@
     .cover-wrap {
       position: relative;
       width: 100%;
-      aspect-ratio: 2 / 2.85;
+      aspect-ratio: 2 / 2.7;
       border-radius: 3px 5px 5px 3px;
       overflow: hidden;
       background: #ffffff;
@@ -158,9 +160,26 @@
       font-weight: 600; line-height: 1.2; word-break: break-word;
     }
 
+    /* ENTEGRE ALTIN KUPA BAŞARI ROZETİ */
+    .trophy-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2b1d0e, #4a3219);
+      border: 1.5px solid #ffd54f;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+
     .wood-shelf {
       width: calc(100% + 12px);
-      height: 7px;
+      height: 6px;
       margin-top: -2px;
       background: linear-gradient(180deg, #9c6638 0%, #7a4b24 55%, #4f2f14 100%);
       border-radius: 2px;
@@ -180,7 +199,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      margin-top: 4px;
+      margin-top: 3px;
     }
     .progress-track {
       flex: 1;
@@ -194,6 +213,9 @@
       background: linear-gradient(90deg, #2b7a78, #0a84ff);
       border-radius: 99px;
       transition: width 0.3s ease;
+    }
+    .progress-fill.done {
+      background: linear-gradient(90deg, #2e7d32, #4caf50);
     }
     .progress-fraction {
       font-size: 8.5px;
@@ -213,6 +235,20 @@
       font-size: 9.5px; font-weight: 600; line-height: 1.15; color: #2b1d12;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
+    .reread-btn {
+      margin-top: 3px;
+      background: #5c3a21;
+      color: #f7efe5;
+      border: none;
+      border-radius: 8px;
+      padding: 2px 7px;
+      font-size: 8.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .reread-btn:active { background: #d9822b; }
+
     .del-btn {
       position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65);
       color: #fff; border: none; width: 16px; height: 16px; border-radius: 50%;
@@ -220,7 +256,40 @@
       z-index: 5;
     }
     .empty-msg {
-      grid-column: 1 / -1; text-align: center; padding: 24px 14px; color: #6e5641; font-size: 12px; line-height: 1.4;
+      grid-column: 1 / -1; text-align: center; padding: 20px 14px; color: #6e5641; font-size: 11.5px; line-height: 1.4;
+    }
+
+    /* EN ALT KALICI İSTATİSTİK BANDI */
+    .stats-footer {
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #4a2d18 0%, #331e0f 100%);
+      color: #f5ebd6;
+      padding: 6px 14px;
+      border-top: 2px solid #8c6239;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      z-index: 10;
+    }
+    .stat-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .stat-line:first-child {
+      color: #e6d5b8;
+      font-size: 10.5px;
+    }
+    .stat-num {
+      background: rgba(217, 130, 43, 0.28);
+      border: 1px solid rgba(255, 213, 79, 0.35);
+      color: #ffd54f;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 11px;
     }
 
     /* OKUMA EKRANI */
@@ -351,7 +420,7 @@
     <div id="lock-error"></div>
   </div>
 
-  <!-- 2. İKİ BÖLÜMLÜ KÜTÜPHANE EKRANI -->
+  <!-- 2. İKİ BÖLÜMLÜ KÜTÜPHANE EKRANI (OKUNANLAR & TAMAMLANANLAR) -->
   <div id="library-view">
     <div class="lib-header">
       <h1>Kitaplığım</h1>
@@ -360,24 +429,38 @@
     </div>
 
     <div class="shelves-container">
+      <!-- ÜST BÖLME: OKUNANLAR -->
       <div class="shelf-section">
         <div class="section-banner">
           <span>OKUNANLAR</span>
           <span class="section-count" id="reading-count">0</span>
         </div>
         <div class="book-grid" id="reading-grid">
-          <div class="empty-msg">Henüz okumaya başladığınız bir kitap yok.</div>
+          <div class="empty-msg">Sağ üstten <b>+ Kitap Ekle</b> butonuna basarak kitap ekleyebilirsiniz.</div>
         </div>
       </div>
 
+      <!-- ALT BÖLME: TAMAMLANANLAR -->
       <div class="shelf-section">
         <div class="section-banner">
-          <span>OKUNACAKLAR</span>
-          <span class="section-count" id="unread-count">0</span>
+          <span>TAMAMLANANLAR</span>
+          <span class="section-count" id="completed-count">0</span>
         </div>
-        <div class="book-grid" id="unread-grid">
-          <div class="empty-msg">Sağ üstten <b>+ Kitap Ekle</b> butonuna basarak kitap ekleyebilirsiniz.</div>
+        <div class="book-grid" id="completed-grid">
+          <div class="empty-msg">Henüz tamamlanan kitap yok. Bitirdiğiniz kitaplar kupa rozetiyle burada toplanır.</div>
         </div>
+      </div>
+    </div>
+
+    <!-- EN ALT KALICI İSTATİSTİK BANDI -->
+    <div class="stats-footer">
+      <div class="stat-line">
+        <span>Bu Ay Okunan Kitap Sayısı</span>
+        <span class="stat-num" id="stat-month-count">0</span>
+      </div>
+      <div class="stat-line">
+        <span>Toplam Okunan Kitap Sayısı</span>
+        <span class="stat-num" id="stat-total-count">0</span>
       </div>
     </div>
   </div>
@@ -475,6 +558,43 @@
       document.getElementById('lock-screen').style.display = 'none';
     }
 
+    // ==========================================
+    // KALICI OKUMA İSTATİSTİKLERİ (SİLİNSE / TEKRAR OKUNSA BİLE DÜŞMEZ)
+    // ==========================================
+    function getCurrentMonthKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getReadingStats() {
+      const curMonth = getCurrentMonthKey();
+      let stats = JSON.parse(localStorage.getItem('kalici_okuma_istatistik')) || {
+        totalRead: 0,
+        monthKey: curMonth,
+        monthRead: 0
+      };
+      if (stats.monthKey !== curMonth) {
+        stats.monthKey = curMonth;
+        stats.monthRead = 0;
+        localStorage.setItem('kalici_okuma_istatistik', JSON.stringify(stats));
+      }
+      return stats;
+    }
+
+    function incrementCompletionStats() {
+      const stats = getReadingStats();
+      stats.totalRead += 1;
+      stats.monthRead += 1;
+      localStorage.setItem('kalici_okuma_istatistik', JSON.stringify(stats));
+      renderStatsFooter();
+    }
+
+    function renderStatsFooter() {
+      const stats = getReadingStats();
+      document.getElementById('stat-month-count').innerText = stats.monthRead;
+      document.getElementById('stat-total-count').innerText = stats.totalRead;
+    }
+
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     let db;
@@ -486,6 +606,7 @@
     req.onsuccess = (e) => {
       db = e.target.result;
       renderLibrary();
+      renderStatsFooter();
     };
 
     let settings = JSON.parse(localStorage.getItem('okuma_ayarlari')) || {
@@ -506,6 +627,9 @@
       'sepia':      { bg: '#ead8b1', text: '#2b2013', r: 234, g: 216, b: 177, invert: false },
       'dark':       { bg: '#000000', text: '#cccccc', r: 0,   g: 0,   b: 0,   invert: true }
     };
+
+    // Entegre Vektörel Altın Kupa İkonu (SVG)
+    const TROPHY_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffd54f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" fill="rgba(255,213,79,0.28)"/></svg>`;
 
     async function extractPdfMetaAndCover(arrayBuffer) {
       try {
@@ -563,7 +687,8 @@
         data: arrayBuffer, cover: coverData,
         cfi: null, progress: 0,
         pdfPage: 1, totalPages: totalPages,
-        started: false
+        completed: false,
+        countedInStats: false
       };
 
       const tx = db.transaction("books", "readwrite");
@@ -591,16 +716,20 @@
 
       let pct = b.progress || 0;
       let fractionText = `%${pct}`;
+      const isDone = Boolean(b.completed);
 
       if (b.type === 'pdf') {
         const curP = b.pdfPage || 1;
         const totP = b.totalPages || 0;
         if (totP > 0) {
-          pct = b.started ? Math.min(100, Math.round((curP / totP) * 100)) : 0;
-          fractionText = `${b.started ? curP : 0}/${totP}`;
+          pct = isDone ? 100 : Math.min(100, Math.round((curP / totP) * 100));
+          fractionText = `${isDone ? totP : curP}/${totP}`;
         } else {
-          fractionText = `${b.started ? curP : 0} s.`;
+          fractionText = `${curP} s.`;
         }
+      } else if (isDone) {
+        pct = 100;
+        fractionText = `%100`;
       }
 
       card.innerHTML = `
@@ -610,19 +739,39 @@
             ? `<img src="${b.cover}" class="book-cover">` 
             : `<div class="book-cover-fallback">${b.title}</div>`}
           <span class="format-badge">${b.type}</span>
+          ${isDone ? `<div class="trophy-badge" title="Tamamlandı">${TROPHY_SVG}</div>` : ''}
         </div>
         <div class="wood-shelf"></div>
         <div class="progress-row">
           <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%;"></div>
+            <div class="progress-fill ${isDone ? 'done' : ''}" style="width:${pct}%;"></div>
           </div>
           <span class="progress-fraction">${fractionText}</span>
         </div>
         <div class="book-info">
           <div class="book-title">${b.title}</div>
+          ${isDone ? `<button class="reread-btn" onclick="rereadBook(event, '${b.id}')">↻ Tekrar Oku</button>` : ''}
         </div>
       `;
       return card;
+    }
+
+    // Tamamlanan kitabı sıfırlayıp tekrar OKUNANLAR rafına taşır (Sayaçları düşürmez!)
+    function rereadBook(e, id) {
+      e.stopPropagation();
+      const tx = db.transaction("books", "readwrite");
+      const store = tx.objectStore("books");
+      store.get(id).onsuccess = (ev) => {
+        const book = ev.target.result;
+        if (!book) return;
+        book.completed = false;
+        book.countedInStats = false; // Tekrar bitirildiğinde yeni okuma olarak sayılabilmesi için
+        book.pdfPage = 1;
+        book.cfi = null;
+        book.progress = 0;
+        store.put(book);
+        tx.oncomplete = () => renderLibrary();
+      };
     }
 
     function renderLibrary() {
@@ -633,27 +782,28 @@
       getAll.onsuccess = () => {
         const books = getAll.result.reverse();
         const readingGrid = document.getElementById('reading-grid');
-        const unreadGrid = document.getElementById('unread-grid');
+        const completedGrid = document.getElementById('completed-grid');
 
-        const readingBooks = books.filter(b => b.started || (b.progress && b.progress > 0) || (b.pdfPage && b.pdfPage > 1));
-        const unreadBooks = books.filter(b => !readingBooks.includes(b));
+        const readingBooks = books.filter(b => !b.completed);
+        const completedBooks = books.filter(b => b.completed);
 
         document.getElementById('reading-count').innerText = readingBooks.length;
-        document.getElementById('unread-count').innerText = unreadBooks.length;
+        document.getElementById('completed-count').innerText = completedBooks.length;
 
         if (readingBooks.length === 0) {
-          readingGrid.innerHTML = `<div class="empty-msg">Henüz okumaya başladığınız bir kitap yok.</div>`;
+          readingGrid.innerHTML = `<div class="empty-msg">Sağ üstten <b>+ Kitap Ekle</b> butonuna basarak kitap ekleyebilirsiniz.</div>`;
         } else {
           readingGrid.innerHTML = '';
           readingBooks.forEach(b => readingGrid.appendChild(createBookCardElement(b)));
         }
 
-        if (unreadBooks.length === 0) {
-          unreadGrid.innerHTML = `<div class="empty-msg">Okunacaklar rafı boş. Sağ üstten <b>+ Kitap Ekle</b> ile yeni kitap ekleyebilirsiniz.</div>`;
+        if (completedBooks.length === 0) {
+          completedGrid.innerHTML = `<div class="empty-msg">Henüz tamamlanan kitap yok. Bitirdiğiniz kitaplar kupa rozetiyle burada toplanır.</div>`;
         } else {
-          unreadGrid.innerHTML = '';
-          unreadBooks.forEach(b => unreadGrid.appendChild(createBookCardElement(b)));
+          completedGrid.innerHTML = '';
+          completedBooks.forEach(b => completedGrid.appendChild(createBookCardElement(b)));
         }
+        renderStatsFooter();
       };
     }
 
@@ -663,6 +813,30 @@
       const tx = db.transaction("books", "readwrite");
       tx.objectStore("books").delete(id);
       tx.oncomplete = () => renderLibrary();
+    }
+
+    // Kitap tamamlandığında otomatik işaretleme ve sayaç artırma
+    function checkAndMarkCompleted() {
+      if (!currentBookRecord) return;
+      let reachedEnd = false;
+
+      if (currentBookRecord.type === 'pdf' && pdfDoc) {
+        if (currentPdfPage >= pdfDoc.numPages && pdfDoc.numPages > 0) {
+          reachedEnd = true;
+        }
+      } else if (currentBookRecord.type === 'epub') {
+        if ((currentBookRecord.progress || 0) >= 99) {
+          reachedEnd = true;
+        }
+      }
+
+      if (reachedEnd && !currentBookRecord.completed) {
+        currentBookRecord.completed = true;
+        if (!currentBookRecord.countedInStats) {
+          currentBookRecord.countedInStats = true;
+          incrementCompletionStats();
+        }
+      }
     }
 
     // ==========================================
@@ -675,7 +849,6 @@
     let currentPdfPage = 1;
     let pdfRenderMode = 'page';
 
-    // Parmakla sağa/sola kaydırma (Swipe) algılayıcı
     let touchStartX = 0;
     let touchStartY = 0;
     let isMultiTouch = false;
@@ -693,19 +866,14 @@
 
     readerEl.addEventListener('touchend', (e) => {
       if (isMultiTouch || e.changedTouches.length > 1) return;
-      // Sayfa yakınlaştırılmışsa (zoom > 1.05) kullanıcı sayfayı sağa-sola kaydırıyor demektir, sayfa atlama
       if (window.visualViewport && window.visualViewport.scale > 1.05) return;
 
       const dx = e.changedTouches[0].screenX - touchStartX;
       const dy = e.changedTouches[0].screenY - touchStartY;
 
-      // Yatay hareket en az 45px olmalı ve dikey kaydırmadan belirgin şekilde büyük olmalı
       if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-        if (dx < 0) {
-          nextPage(); // Sola sürükleyince -> Sonraki sayfa
-        } else {
-          prevPage(); // Sağa sürükleyince -> Önceki sayfa
-        }
+        if (dx < 0) nextPage();
+        else prevPage();
       }
     }, { passive: true });
 
@@ -733,9 +901,6 @@
       const tx = db.transaction("books", "readonly");
       tx.objectStore("books").get(id).onsuccess = async (e) => {
         currentBookRecord = e.target.result;
-        currentBookRecord.started = true;
-        saveBookProgress();
-
         document.getElementById('reader-view').style.display = 'flex';
         document.getElementById('reader-book-title').innerText = currentBookRecord.title;
         closeMenus();
@@ -770,6 +935,7 @@
               const pct = Math.round(currentBook.locations.percentageFromCfi(location.start.cfi) * 100);
               currentBookRecord.progress = pct;
             }
+            checkAndMarkCompleted();
             saveBookProgress();
             updateProgressUI();
           });
@@ -958,6 +1124,8 @@
       currentBookRecord.pdfPage = currentPdfPage;
       currentBookRecord.totalPages = pdfDoc.numPages;
       currentBookRecord.progress = pct;
+
+      checkAndMarkCompleted();
       saveBookProgress();
       updateProgressUI();
     }
